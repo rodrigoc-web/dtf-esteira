@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12161F">
+<meta name="robots" content="noindex, nofollow">
+<title>Esteira</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png">
+<link rel="apple-touch-icon" href="icone-192.png">
+<style>
+:root{
+  --fundo:#F3F4F6; --card:#FFFFFF; --borda:#E5E7EB; --texto:#111827; --sub:#6B7280;
+  --verde:#9EF01A; --verde-esc:#7CC70F; --sobre-verde:#111827; --barra:#12161F;
+  --ok:#16A34A; --ok-bg:#DCFCE7; --aviso:#B45309; --aviso-bg:#FEF3C7; --erro:#DC2626; --erro-bg:#FEE2E2;
+  --info:#2563EB; --info-bg:#DBEAFE;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--fundo);color:var(--texto);
+  font-family:"Segoe UI",Roboto,system-ui,sans-serif;overscroll-behavior:none}
+button{font:inherit;cursor:pointer;border:0}
+.oculto{display:none!important}
+
+/* Topo */
+header{background:var(--barra);color:#fff;display:flex;align-items:center;gap:14px;padding:12px 18px;
+  padding-top:max(12px,env(safe-area-inset-top))}
+.marca{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px}
+.marca img{width:34px;height:34px;border-radius:8px}
+.marca small{font-weight:600;font-size:11px;background:var(--verde);color:var(--sobre-verde);padding:2px 7px;border-radius:6px}
+header .quem{margin-left:auto;text-align:right;line-height:1.2}
+header .quem b{display:block;font-size:15px}
+header .quem span{font-size:12px;color:#C7CCD6}
+.sair{background:transparent;border:1px solid #3A4152;color:#fff;border-radius:10px;padding:9px 14px;font-size:14px}
+.status{width:10px;height:10px;border-radius:50%;background:#6B7280;flex:none}
+.status.on{background:var(--verde)} .status.off{background:var(--erro)}
+
+/* Login */
+#login{max-width:880px;margin:0 auto;padding:22px 16px}
+#login h1{font-size:24px;margin:6px 0 4px} #login p.sub{color:var(--sub);margin:0 0 16px}
+.ops{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.op{background:var(--card);border:2px solid var(--borda);border-radius:14px;padding:18px 14px;text-align:left;min-height:84px}
+.op b{display:block;font-size:19px} .op span{color:var(--sub);font-size:13px}
+.op.sel{border-color:var(--verde-esc);background:#F4FDE6}
+.senha{margin-top:18px;background:var(--card);border:1px solid var(--borda);border-radius:16px;padding:18px;
+  display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:center}
+.pontos{display:flex;gap:10px;margin:10px 0 6px;min-height:22px}
+.pontos i{width:18px;height:18px;border-radius:50%;background:var(--texto)}
+.teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.teclado button{background:#F3F4F6;border-radius:12px;height:62px;font-size:24px;font-weight:600}
+.teclado button:active{background:#E5E7EB}
+.entrar{background:var(--verde);color:var(--sobre-verde);border-radius:12px;height:56px;font-size:19px;font-weight:700;width:100%;margin-top:12px}
+.entrar:disabled{opacity:.45}
+.msg{border-radius:12px;padding:12px 14px;margin-top:12px;font-size:15px}
+.msg.erro{background:var(--erro-bg);color:var(--erro)} .msg.aviso{background:var(--aviso-bg);color:var(--aviso)}
+
+/* Esteira */
+#esteira{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);gap:16px;padding:16px;
+  max-width:1500px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--borda);border-radius:16px;padding:16px}
+.leitor label{font-weight:700;font-size:15px;display:block;margin-bottom:8px}
+.leitor .linha{display:flex;gap:10px}
+#codigo{flex:1;min-width:0;height:58px;border:2px solid var(--borda);border-radius:12px;padding:0 16px;font-size:22px;
+  font-family:Consolas,monospace;outline:none;background:#FAFAFA}
+#codigo:focus{border-color:var(--verde-esc);background:#fff}
+.btn{border-radius:12px;padding:0 18px;height:58px;font-size:17px;font-weight:700}
+.btn.verde{background:var(--verde);color:var(--sobre-verde)}
+.btn.contorno{background:#fff;border:2px solid var(--borda);color:var(--texto)}
+.dica{color:var(--sub);font-size:13px;margin-top:8px}
+#cartao{margin-top:14px;min-height:300px}
+.vazio{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);text-align:center;min-height:300px;gap:8px}
+.vazio .icone{font-size:52px;opacity:.55}
+.ped-topo{display:flex;align-items:center;gap:12px}
+.mkt{width:44px;height:44px;border-radius:10px;object-fit:contain;background:#F3F4F6;flex:none}
+.ped-topo h2{margin:0;font-size:22px} .ped-topo .sub{color:var(--sub);font-size:13px}
+.etapas{display:flex;gap:6px;margin:14px 0 6px;flex-wrap:wrap}
+.etapa{padding:6px 11px;border-radius:999px;font-size:13px;font-weight:600;background:#F3F4F6;color:var(--sub)}
+.etapa.feita{background:var(--ok-bg);color:var(--ok)} .etapa.minha{outline:2px solid var(--verde-esc)}
+.itens{margin-top:10px;display:flex;flex-direction:column;gap:10px;max-height:46vh;overflow:auto}
+.item{display:flex;gap:12px;align-items:flex-start}
+.foto{width:76px;height:76px;border-radius:10px;background:#F3F4F6;object-fit:cover;flex:none}
+.item b{display:block;font-size:15px} .item span{color:var(--sub);font-size:13px}
+.total{font-size:22px;font-weight:800;color:var(--info);margin:12px 0 4px}
+.confirmar{width:100%;height:68px;border-radius:14px;background:var(--verde);color:var(--sobre-verde);font-size:21px;font-weight:800;margin-top:10px}
+.confirmar:disabled{opacity:.5}
+.feito{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;min-height:300px;justify-content:center}
+.feito .ok{font-size:64px;color:var(--ok);line-height:1}
+.faixa{border-radius:12px;padding:12px 18px;font-size:19px;font-weight:700;background:var(--ok-bg)}
+.faixa.re{background:var(--aviso-bg)}
+
+/* Painel */
+.painel h3{margin:0 0 10px;font-size:16px}
+.meta{display:flex;align-items:baseline;gap:8px} .meta b{font-size:40px;line-height:1} .meta span{color:var(--sub)}
+.barra{height:12px;background:#EEF0F3;border-radius:999px;overflow:hidden;margin:10px 0 4px}
+.barra i{display:block;height:100%;background:var(--verde-esc);border-radius:999px}
+.mini{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.mini div{background:#F9FAFB;border:1px solid var(--borda);border-radius:12px;padding:10px}
+.mini b{display:block;font-size:20px} .mini span{color:var(--sub);font-size:12px}
+.equipe{margin-top:16px} .pessoa{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--borda)}
+.pessoa .av{width:34px;height:34px;border-radius:50%;background:#EEF0F3;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+.pessoa.eu .av{background:var(--verde);color:var(--sobre-verde)}
+.pessoa .nm{flex:1;min-width:0} .pessoa .nm b{font-size:14px} .pessoa .nm .barra{height:7px;margin:5px 0 0}
+.pessoa .qt{font-weight:700;font-size:15px;text-align:right}
+.atualizado{color:var(--sub);font-size:12px;margin-top:10px}
+
+@media (max-width:820px){
+  #esteira{grid-template-columns:1fr} .senha{grid-template-columns:1fr} header .quem span{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca"><img src="icone-192.png" alt="">Esteira <small>DTF PRO</small></div>
+  <span class="status" id="status" title="Conexão"></span>
+  <div class="quem oculto" id="quem"><b id="quemNome"></b><span id="quemSetor"></span></div>
+  <button class="sair oculto" id="sair">Sair</button>
+</header>
+
+<!-- ── Login ─────────────────────────────────────────────────────────── -->
+<main id="login" class="oculto">
+  <h1>Quem está usando?</h1>
+  <p class="sub">Toque no seu usuário e digite a senha.</p>
+  <div class="ops" id="ops"></div>
+  <div class="senha oculto" id="senhaBox">
+    <div>
+      <div style="font-size:14px;color:var(--sub)">Senha de</div>
+      <div style="font-size:22px;font-weight:700" id="senhaDe"></div>
+      <div class="pontos" id="pontos"></div>
+      <div class="msg erro oculto" id="erroLogin"></div>
+    </div>
+    <div>
+      <div class="teclado" id="teclado"></div>
+      <button class="entrar" id="entrar" disabled>Entrar</button>
+    </div>
+  </div>
+  <div class="msg erro oculto" id="erroOps"></div>
+</main>
+
+<!-- ── Esteira ───────────────────────────────────────────────────────── -->
+<main id="esteira" class="oculto">
+  <section>
+    <div class="card leitor">
+      <label for="codigo">Código da etiqueta</label>
+      <div class="linha">
+        <input id="codigo" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="none"
+               placeholder="Bipe a etiqueta">
+        <button class="btn contorno" id="digitar" title="Digitar com o teclado da tela">⌨</button>
+        <button class="btn verde" id="buscar">Buscar</button>
+      </div>
+      <div class="dica">Bipe a etiqueta de envio ou a DANFE. O pedido precisa ter passado pelo Design.</div>
+    </div>
+    <div class="card" id="cartao"></div>
+  </section>
+  <aside class="card painel" id="painel">
+    <h3 id="painelTitulo">Meu setor hoje</h3>
+    <div class="meta"><b id="feito">—</b><span id="metaTxt"></span></div>
+    <div class="barra"><i id="barraSetor" style="width:0"></i></div>
+    <div style="color:var(--sub);font-size:13px" id="pctTxt"></div>
+    <div class="mini">
+      <div><b id="meusPedidos">—</b><span>meus pedidos hoje</span></div>
+      <div><b id="minhasPecas">—</b><span>minhas peças hoje</span></div>
+      <div><b id="pedidosSetor">—</b><span>pedidos do setor</span></div>
+      <div><b id="retrabalho">—</b><span>retrabalho do setor</span></div>
+    </div>
+    <div class="equipe"><h3>Equipe</h3><div id="equipe"></div></div>
+    <div class="atualizado" id="atualizado"></div>
+  </aside>
+</main>
+
+<script>
+"use strict";
+// Endereço da função no Supabase. Fora do site oficial (servidor de teste no
+// notebook, aberto pelo IP da rede), usa o "/api" do próprio servidor --
+// nunca manda a senha pra outro endereço.
+const API = location.hostname.endsWith("github.io")
+  ? "https://phfucnpoeaqreutbwsot.supabase.co/functions/v1/esteira"
+  : "/api";
+const ETAPAS = [["DESIGNER","Design"],["IMPRESSORA","Impressão"],["SEPARACAO","Separação"],["PRENSA","Prensa"]];
+const VERBO = {DESIGNER:"peças no design", IMPRESSORA:"peças impressas", SEPARACAO:"peças separadas", PRENSA:"peças prensadas"};
+const MKT = ["mercado","shopee","shein","tiktok","temu","amazon","kwai","aliexpress"];
+const NOME_MKT = {mercado:"Mercado Livre", shopee:"Shopee", shein:"SHEIN", tiktok:"TikTok Shop", temu:"Temu",
+  amazon:"Amazon", kwai:"Kwai", aliexpress:"AliExpress", physical:"Loja física"};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const guardar = {
+  ler(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  por(k,v){ try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let sessao = guardar.ler("esteira_sessao");   // {ficha, nome, setor, rotulo_setor}
+let pedidoAtual = null, ocupado = false, timerPainel = null;
+
+async function chamar(acao, dados = {}) {
+  let r;
+  try {
+    r = await fetch(API, {method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify({acao, ...dados, ficha: sessao?.ficha})});
+  } catch {
+    $("status").className = "status off";
+    throw new Error("Sem internet. Confira o Wi-Fi do tablet.");
+  }
+  $("status").className = "status on";
+  let j = {};
+  try { j = await r.json(); } catch {}
+  if (r.status === 401 && acao !== "entrar") { sair(j.erro || "Entre de novo."); throw new Error(j.erro || "Entre de novo."); }
+  if (!r.ok) throw new Error(j.erro || "Falha no servidor. Tente de novo.");
+  return j;
+}
+
+// ── Som e vibração: a fábrica é barulhenta, o operador olha pra peça ──────
+let audio;
+function bip(ok) {
+  try {
+    audio ??= new (window.AudioContext || window.webkitAudioContext)();
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.frequency.value = ok ? 1046 : 220; o.type = ok ? "sine" : "square";
+    g.gain.value = .12; o.connect(g); g.connect(audio.destination);
+    o.start(); o.stop(audio.currentTime + (ok ? .15 : .45));
+  } catch {}
+  try { navigator.vibrate?.(ok ? 60 : [120, 80, 120]); } catch {}
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────
+let escolhido = null, senha = "";
+function telaLogin(msg) {
+  $("esteira").classList.add("oculto"); $("login").classList.remove("oculto");
+  $("quem").classList.add("oculto"); $("sair").classList.add("oculto");
+  senha = ""; desenharPontos();
+  const e = $("erroOps"); e.classList.toggle("oculto", !msg); e.textContent = msg || "";
+  carregarOperadores();
+}
+async function carregarOperadores() {
+  $("ops").innerHTML = '<div style="color:var(--sub)">Carregando…</div>';
+  try {
+    const {operadores} = await chamar("operadores");
+    if (!operadores.length) { $("ops").innerHTML = '<div style="color:var(--sub)">Nenhum usuário liberado pro tablet.</div>'; return; }
+    const ultimo = guardar.ler("esteira_ultimo");
+    $("ops").innerHTML = "";
+    for (const o of operadores) {
+      const b = document.createElement("button");
+      b.className = "op"; b.innerHTML = `<b>${esc(o.nome)}</b><span>${esc(o.rotulo_setor)}</span>`;
+      b.onclick = () => escolher(o.nome, b);
+      $("ops").appendChild(b);
+      if (o.nome === ultimo) escolher(o.nome, b);
+    }
+  } catch (e) {
+    $("ops").innerHTML = `<button class="op" onclick="carregarOperadores()"><b>Tentar de novo</b><span>${esc(e.message)}</span></button>`;
+  }
+}
+function escolher(nome, botao) {
+  escolhido = nome; senha = ""; desenharPontos();
+  document.querySelectorAll(".op").forEach((b) => b.classList.toggle("sel", b === botao));
+  $("senhaDe").textContent = nome; $("senhaBox").classList.remove("oculto"); $("erroLogin").classList.add("oculto");
+}
+function desenharPontos() {
+  $("pontos").innerHTML = "<i></i>".repeat(senha.length);
+  $("entrar").disabled = !senha || !escolhido;
+}
+(function montarTeclado() {
+  for (const t of ["1","2","3","4","5","6","7","8","9","⌫","0","✓"]) {
+    const b = document.createElement("button"); b.textContent = t;
+    b.onclick = () => tecla(t);
+    $("teclado").appendChild(b);
+  }
+})();
+$("entrar").onclick = () => entrar();
+function tecla(t) {
+  if (t === "⌫") senha = senha.slice(0, -1);
+  else if (t === "✓") return entrar();
+  else if (senha.length < 12) senha += t;
+  desenharPontos();
+}
+async function entrar() {
+  if (!escolhido || !senha || ocupado) return;
+  ocupado = true; $("entrar").disabled = true; $("entrar").textContent = "Entrando…";
+  try {
+    sessao = await chamar("entrar", {nome: escolhido, senha});
+    guardar.por("esteira_sessao", sessao); guardar.por("esteira_ultimo", sessao.nome);
+    telaEsteira();
+  } catch (e) {
+    $("erroLogin").textContent = e.message; $("erroLogin").classList.remove("oculto");
+    senha = ""; bip(false);
+  } finally {
+    ocupado = false; $("entrar").textContent = "Entrar"; desenharPontos();
+  }
+}
+function sair(msg) {
+  sessao = null; guardar.por("esteira_sessao", null); pedidoAtual = null;
+  clearInterval(timerPainel); telaLogin(msg);
+}
+$("sair").onclick = () => { if (confirm("Sair da Esteira?")) sair(); };
+
+// Teclado físico na tela de senha (se o tablet tiver um ligado).
+document.addEventListener("keydown", (ev) => {
+  if (!$("login").classList.contains("oculto") && !$("senhaBox").classList.contains("oculto")) {
+    if (/^[0-9]$/.test(ev.key)) { tecla(ev.key); ev.preventDefault(); }
+    else if (ev.key === "Backspace") { tecla("⌫"); ev.preventDefault(); }
+    else if (ev.key === "Enter") { entrar(); ev.preventDefault(); }
+  }
+});
+
+// ── Esteira ───────────────────────────────────────────────────────────────
+function telaEsteira() {
+  $("login").classList.add("oculto"); $("esteira").classList.remove("oculto");
+  $("quem").classList.remove("oculto"); $("sair").classList.remove("oculto");
+  $("quemNome").textContent = sessao.nome; $("quemSetor").textContent = sessao.rotulo_setor;
+  $("painelTitulo").textContent = `${sessao.rotulo_setor} hoje`;
+  cartaoVazio(); focar(); atualizarPainel();
+  clearInterval(timerPainel); timerPainel = setInterval(atualizarPainel, 30000);
+}
+function focar() {
+  const c = $("codigo");
+  if (document.activeElement !== c) c.focus({preventScroll:true});
+}
+// O leitor é um teclado: se o cursor saiu do campo, as teclas vão pra ele mesmo assim.
+document.addEventListener("keydown", (ev) => {
+  if ($("esteira").classList.contains("oculto")) return;
+  const c = $("codigo");
+  if (document.activeElement === c) return;
+  if (ev.key === "Enter") { buscar(); ev.preventDefault(); return; }
+  if (ev.key.length === 1 && !ev.ctrlKey && !ev.altKey && !ev.metaKey) { c.focus(); c.value += ev.key; ev.preventDefault(); }
+});
+$("codigo").addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.preventDefault(); buscar(); } });
+$("buscar").onclick = () => buscar();
+$("digitar").onclick = () => {   // abre o teclado da tela pra digitar o código à mão
+  const c = $("codigo"); c.setAttribute("inputmode", "text"); c.blur(); setTimeout(() => c.focus(), 30);
+};
+$("codigo").addEventListener("blur", () => $("codigo").setAttribute("inputmode", "none"));
+document.addEventListener("click", (ev) => {
+  if (!$("esteira").classList.contains("oculto") && !ev.target.closest("button,input,a")) focar();
+});
+
+function cartaoVazio() {
+  pedidoAtual = null;
+  $("cartao").innerHTML = `<div class="vazio"><div class="icone">▥</div>
+    <b style="font-size:18px;color:var(--texto)">Aguardando leitura</b>
+    <span>Bipe a etiqueta do pedido pra registrar a ${esc(sessao.rotulo_setor)}.</span></div>`;
+}
+function cartaoMsg(tipo, titulo, texto) {
+  $("cartao").innerHTML = `<div class="vazio"><div class="icone">${tipo === "erro" ? "⚠" : "…"}</div>
+    <b style="font-size:18px;color:${tipo === "erro" ? "var(--erro)" : "var(--texto)"}">${esc(titulo)}</b>
+    <span>${esc(texto || "")}</span></div>`;
+}
+
+async function buscar() {
+  const c = $("codigo"), codigo = c.value.trim();
+  if (!codigo || ocupado) return;
+  c.value = ""; ocupado = true;
+  cartaoMsg("info", "Buscando pedido…", codigo);
+  try {
+    const r = await chamar("buscar", {codigo});
+    mostrarPedido(r);
+  } catch (e) {
+    cartaoMsg("erro", "Não deu pra ler", e.message); bip(false);
+  } finally { ocupado = false; focar(); }
+}
+
+function mostrarPedido(r) {
+  const p = r.pedido, et = r.etapa, meu = sessao.setor;
+  pedidoAtual = p;
+  const ordem = ETAPAS.map((e) => e[0]);
+  const jaFez = et.concluidas.includes(meu);
+  const antes = ordem.slice(0, ordem.indexOf(meu)).filter((e) => !et.concluidas.includes(e));
+  const icone = MKT.includes(p.plataforma) ? `<img class="mkt" src="marketplaces/${p.plataforma}.png" alt="">`
+    : `<div class="mkt" style="display:flex;align-items:center;justify-content:center;font-size:22px">🛍</div>`;
+  const itens = p.itens.map((i) => `<div class="item">
+      ${i.imagem && /^https?:\/\//.test(i.imagem) ? `<img class="foto" loading="lazy" src="${esc(i.imagem.replace(/^http:/, "https:"))}" alt="" onerror="this.style.visibility='hidden'">` : '<div class="foto"></div>'}
+      <div><b>${esc(i.nome || "SKU " + i.sku)}</b>
+      <span>SKU ${esc(i.sku)}${i.variacao ? " · " + esc(i.variacao) : ""} · qtd ${i.quantidade}</span></div></div>`).join("");
+  let aviso = "";
+  if (jaFez) aviso = `<div class="msg aviso">A ${esc(sessao.rotulo_setor)} deste pedido já foi registrada. Confirmar de novo conta como <b>retrabalho</b>.</div>`;
+  else if (antes.length) aviso = `<div class="msg aviso">Ainda falta: ${antes.map((e) => ETAPAS.find((x) => x[0] === e)[1]).join(", ")}.</div>`;
+  $("cartao").innerHTML = `
+    <div class="ped-topo">${icone}<div><h2>${esc(p.pedido_up)}</h2>
+      <div class="sub">${esc(NOME_MKT[p.plataforma] || p.plataforma || "")}${p.loja ? " · " + esc(p.loja) : ""}${p.venda ? " · venda " + esc(p.venda) : ""}</div></div></div>
+    <div class="etapas">${ETAPAS.map(([k, n]) => `<span class="etapa${et.concluidas.includes(k) ? " feita" : ""}${k === meu ? " minha" : ""}">${et.concluidas.includes(k) ? "✓ " : ""}${n}</span>`).join("")}</div>
+    <div style="font-weight:700;margin-top:6px">Itens (${p.itens.length})</div>
+    <div class="itens">${itens}</div>
+    <div class="total">Total de peças: ${p.pecas}</div>
+    ${aviso}
+    <button class="confirmar" id="confirmar">Confirmar Conclusão — ${esc(sessao.rotulo_setor)}</button>
+    <button class="btn contorno" style="width:100%;margin-top:8px;height:48px" id="cancelar">Cancelar</button>`;
+  $("confirmar").onclick = () => confirmar(p);
+  $("cancelar").onclick = () => { cartaoVazio(); focar(); };
+  bip(true);
+}
+
+async function confirmar(p) {
+  if (ocupado) return;
+  ocupado = true; $("confirmar").disabled = true; $("confirmar").textContent = "Registrando…";
+  try {
+    const reg = await chamar("registrar", {pedido_up: p.pedido_up});
+    const [dia, hora] = reg.registrado_em.split(" "); const [a, m, d] = dia.split("-");
+    $("cartao").innerHTML = `<div class="feito"><div class="ok">✓</div>
+      <b style="font-size:24px">Produção registrada!</b><span style="color:var(--sub)">Pedido ${esc(p.pedido_up)}</span>
+      <div class="faixa${reg.retrabalho ? " re" : ""}">${reg.pecas} ${VERBO[reg.etapa] || "peças"}${reg.retrabalho ? " (retrabalho)" : ""}</div>
+      <span style="color:var(--sub);font-size:13px">Registrado em ${d}/${m}/${a} às ${hora.slice(0, 5)}</span>
+      <button class="btn verde" style="margin-top:10px;width:260px" id="nova">Nova leitura</button>
+      <span style="color:var(--sub);font-size:13px">ou bipe a próxima etiqueta</span></div>`;
+    $("nova").onclick = () => { cartaoVazio(); focar(); };
+    pedidoAtual = null; bip(true); atualizarPainel();
+  } catch (e) {
+    $("confirmar").disabled = false; $("confirmar").textContent = `Confirmar Conclusão — ${sessao.rotulo_setor}`;
+    alert(e.message); bip(false);
+  } finally { ocupado = false; focar(); }
+}
+
+async function atualizarPainel() {
+  if (!sessao) return;
+  try {
+    const d = await chamar("painel");
+    const e = d.por_etapa[d.setor];
+    $("feito").textContent = e.feito.toLocaleString("pt-BR");
+    $("metaTxt").textContent = `de ${e.meta.toLocaleString("pt-BR")} ${e.unidade} (meta)`;
+    $("barraSetor").style.width = Math.min(100, e.pct) + "%";
+    $("pctTxt").textContent = `${e.pct}% da meta do dia`;
+    const eu = d.funcionarios.find((f) => f.eu) || {pedidos:0, pecas:0};
+    $("meusPedidos").textContent = eu.pedidos; $("minhasPecas").textContent = eu.pecas.toLocaleString("pt-BR");
+    $("pedidosSetor").textContent = e.pedidos; $("retrabalho").textContent = d.retrabalho;
+    $("equipe").innerHTML = d.funcionarios.length ? d.funcionarios.map((f) => `
+      <div class="pessoa${f.eu ? " eu" : ""}"><div class="av">${esc(f.operador.replace(/[^A-Z0-9]/gi, "").slice(-2) || "?")}</div>
+        <div class="nm"><b>${esc(f.operador)}</b><div class="barra"><i style="width:${Math.min(100, f.pct)}%"></i></div></div>
+        <div class="qt">${f.feito.toLocaleString("pt-BR")}<div style="color:var(--sub);font-size:11px;font-weight:400">${esc(f.unidade)}</div></div></div>`).join("")
+      : '<div style="color:var(--sub);font-size:13px">Ninguém do setor registrou hoje ainda.</div>';
+    $("atualizado").textContent = "Atualizado às " + new Date().toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"});
+  } catch {}
+}
+
+// ── Início ────────────────────────────────────────────────────────────────
+if (API.startsWith("/")) {   // servidor de teste: deixa claro que não grava na fábrica
+  const t = document.createElement("small");
+  t.textContent = "TESTE — não grava"; t.style.cssText = "background:#F59E0B;color:#111827";
+  document.querySelector(".marca").appendChild(t);
+}
+if (sessao?.ficha) telaEsteira(); else telaLogin();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
