@@ -103,6 +103,44 @@ header .quem span{font-size:12px;color:#C7CCD6}
 .pessoa .qt{font-weight:700;font-size:15px;text-align:right}
 .atualizado{color:var(--sub);font-size:12px;margin-top:10px}
 
+/* Minha meta, ranking e comemoração (Rodrigo, 11/11/2026) */
+.minha{margin-top:14px;background:#F4FDE6;border:1px solid #D9F5AE;border-radius:14px;padding:12px 14px}
+.minha.bateu{background:#FEF9C3;border-color:#FDE047}
+.minha b{font-size:17px} .minha span{color:var(--sub);font-size:13px}
+.ranking{position:relative;margin-top:6px;transition:height .4s}
+.linha-rk{position:absolute;left:0;right:0;height:58px;display:flex;align-items:center;gap:10px;padding:0 4px;
+  border-top:1px solid var(--borda);transition:transform .7s cubic-bezier(.2,.8,.2,1);background:var(--card)}
+.linha-rk.eu{background:#F7FEE9;border-radius:10px}
+.pos{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
+  background:#EEF0F3;font-weight:800;font-size:15px}
+.pos.ouro,.pos.prata,.pos.bronze{font-size:22px}
+.pos.ouro{background:linear-gradient(145deg,#FDE68A,#F59E0B);box-shadow:0 2px 8px #F59E0B66}
+.pos.prata{background:linear-gradient(145deg,#F3F4F6,#9CA3AF)} .pos.bronze{background:linear-gradient(145deg,#FED7AA,#C2410C)}
+.linha-rk .nm{flex:1;min-width:0} .linha-rk .nm b{font-size:15px}
+.linha-rk .barra{height:9px;margin:5px 0 0} .linha-rk .barra i{transition:width .8s}
+.linha-rk.bateu .barra i{background:linear-gradient(90deg,#F59E0B,#FACC15)}
+.linha-rk .qt{text-align:right;font-weight:800;font-size:17px;min-width:70px}
+.linha-rk .qt small{display:block;color:var(--sub);font-size:11px;font-weight:500}
+.taca{font-size:20px;display:inline-block;animation:pula 1.2s ease-in-out infinite}
+@keyframes pula{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+#festa{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 40%,#1f2937ee,#030712f2);color:#fff;text-align:center}
+#festa canvas{position:absolute;inset:0;pointer-events:none}
+#festa .caixa{position:relative;padding:20px;animation:entra .6s cubic-bezier(.2,1.4,.4,1)}
+#festa .trofeu{font-size:110px;line-height:1;animation:brilha 1.6s ease-in-out infinite}
+#festa h1{font-size:44px;margin:10px 0 4px;color:#FACC15;letter-spacing:.5px}
+#festa p{font-size:21px;margin:4px 0 18px;color:#E5E7EB}
+#festa .palmas{font-size:64px;display:flex;gap:18px;justify-content:center}
+#festa .palmas span{display:inline-block;animation:palma .45s ease-in-out infinite alternate}
+#festa .palmas span:nth-child(2){animation-delay:.15s} #festa .palmas span:nth-child(3){animation-delay:.3s}
+#festa small{display:block;margin-top:22px;color:#9CA3AF;font-size:14px}
+@keyframes palma{from{transform:scale(.8) rotate(-12deg)}to{transform:scale(1.15) rotate(12deg)}}
+@keyframes brilha{0%,100%{transform:scale(1) rotate(-4deg);filter:drop-shadow(0 0 10px #FACC15)}50%{transform:scale(1.08) rotate(4deg);filter:drop-shadow(0 0 28px #FACC15)}}
+@keyframes entra{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+#aviso-meta{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-200%);z-index:40;background:#111827;color:#fff;
+  padding:12px 20px;border-radius:999px;font-size:16px;font-weight:700;box-shadow:0 8px 24px #0004;transition:transform .5s}
+#aviso-meta.ver{transform:translateX(-50%) translateY(0)}
+
 @media (max-width:820px){
   #esteira{grid-template-columns:1fr} .senha{grid-template-columns:1fr} header .quem span{display:none}
 }
@@ -162,10 +200,17 @@ header .quem span{font-size:12px;color:#C7CCD6}
       <div><b id="pedidosSetor">—</b><span>pedidos do setor</span></div>
       <div><b id="retrabalho">—</b><span>retrabalho do setor</span></div>
     </div>
-    <div class="equipe"><h3>Equipe</h3><div id="equipe"></div></div>
+    <div class="minha" id="minha"><b id="minhaTxt">—</b><div class="barra"><i id="minhaBarra" style="width:0"></i></div>
+      <span id="minhaSub"></span></div>
+    <div class="equipe"><h3>🏆 Ranking de hoje</h3><div class="ranking" id="ranking"></div></div>
     <div class="atualizado" id="atualizado"></div>
   </aside>
 </main>
+
+<div id="festa" class="oculto"><canvas id="confete"></canvas><div class="caixa">
+  <div class="trofeu">🏆</div><h1 id="festaTitulo">PARABÉNS!</h1><p id="festaTexto"></p>
+  <div class="palmas"><span>👏</span><span>👏</span><span>👏</span></div><small>toque para continuar</small></div></div>
+<div id="aviso-meta"></div>
 
 <script>
 "use strict";
@@ -417,13 +462,122 @@ async function atualizarPainel() {
     const eu = d.funcionarios.find((f) => f.eu) || {pedidos:0, pecas:0};
     $("meusPedidos").textContent = eu.pedidos; $("minhasPecas").textContent = eu.pecas.toLocaleString("pt-BR");
     $("pedidosSetor").textContent = e.pedidos; $("retrabalho").textContent = d.retrabalho;
-    $("equipe").innerHTML = d.funcionarios.length ? d.funcionarios.map((f) => `
-      <div class="pessoa${f.eu ? " eu" : ""}"><div class="av">${esc(f.operador.replace(/[^A-Z0-9]/gi, "").slice(-2) || "?")}</div>
-        <div class="nm"><b>${esc(f.operador)}</b><div class="barra"><i style="width:${Math.min(100, f.pct)}%"></i></div></div>
-        <div class="qt">${f.feito.toLocaleString("pt-BR")}<div style="color:var(--sub);font-size:11px;font-weight:400">${esc(f.unidade)}</div></div></div>`).join("")
-      : '<div style="color:var(--sub);font-size:13px">Ninguém do setor registrou hoje ainda.</div>';
+    minhaMeta(eu, d);
+    desenharRanking(d.funcionarios);
+    comemorar(d);
     $("atualizado").textContent = "Atualizado às " + new Date().toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"});
   } catch {}
+}
+
+// ── Minha meta, ranking e comemoração (Rodrigo, 11/11/2026) ───────────────
+// Estímulo pra Prensa: placar do dia com troféu e, quando a pessoa bate a
+// SUA meta, a tela de "Parabéns" com palmas e confete. Quando um colega bate,
+// aparece um aviso pra todo mundo.
+function minhaMeta(eu, d) {
+  const un = eu.unidade || d.por_etapa[d.setor].unidade, meta = d.meta_pessoa || eu.meta || 0;
+  const feito = eu.feito || 0, falta = Math.max(0, meta - feito), bateu = meta > 0 && feito >= meta;
+  $("minha").classList.toggle("bateu", bateu);
+  $("minhaTxt").textContent = bateu ? `🏆 Meta batida! ${feito.toLocaleString("pt-BR")} ${un}`
+    : `Minha meta: ${feito.toLocaleString("pt-BR")} de ${meta.toLocaleString("pt-BR")} ${un}`;
+  $("minhaBarra").style.width = Math.min(100, meta ? 100 * feito / meta : 0) + "%";
+  $("minhaSub").textContent = bateu ? "Mandou bem! Cada peça a mais conta pro ranking."
+    : falta ? `Faltam ${falta.toLocaleString("pt-BR")} ${un} para a sua meta` : "";
+}
+
+const MEDALHA = ["🥇", "🥈", "🥉"], CLASSE = ["ouro", "prata", "bronze"], ALTURA_RK = 58;
+function desenharRanking(lista) {
+  const caixa = $("ranking");
+  if (!lista.length) {
+    caixa.style.height = "auto";
+    caixa.innerHTML = '<div style="color:var(--sub);font-size:13px">Ninguém cadastrado neste setor.</div>';
+    return;
+  }
+  [...caixa.children].forEach((el) => { if (!el.id) el.remove(); });
+  caixa.style.height = (lista.length * ALTURA_RK) + "px";
+  const vistos = new Set();
+  lista.forEach((f, i) => {
+    const id = "rk-" + f.operador.replace(/[^A-Za-z0-9]/g, "_");
+    vistos.add(id);
+    let el = document.getElementById(id);
+    if (!el) {                       // novo: nasce na posição certa, depois só desliza
+      el = document.createElement("div"); el.id = id;
+      el.style.transform = `translateY(${i * ALTURA_RK}px)`;
+      caixa.appendChild(el);
+    }
+    el.className = "linha-rk" + (f.eu ? " eu" : "") + (f.bateu ? " bateu" : "");
+    const pos = f.feito > 0 && i < 3 ? `<div class="pos ${CLASSE[i]}">${MEDALHA[i]}</div>` : `<div class="pos">${i + 1}º</div>`;
+    const ritmo = f.por_hora ? ` · ${f.por_hora}/h` : "";
+    el.innerHTML = `${pos}<div class="nm"><b>${esc(f.operador)}</b> ${f.bateu ? '<span class="taca">🏆</span>' : ""}
+      <div class="barra"><i style="width:${Math.min(100, f.pct)}%"></i></div></div>
+      <div class="qt">${f.feito.toLocaleString("pt-BR")}<small>${f.pct}% da meta${ritmo}</small></div>`;
+    requestAnimationFrame(() => { el.style.transform = `translateY(${i * ALTURA_RK}px)`; });
+  });
+  [...caixa.children].forEach((el) => { if (el.id && !vistos.has(el.id)) el.remove(); });
+}
+
+let jaBateram = null;           // quem já tinha batido a meta na leitura anterior
+function comemorar(d) {
+  const chave = "esteira_festa_" + d.dia;
+  const feitos = new Set(guardar.ler(chave) || []);
+  const agora = new Set(d.funcionarios.filter((f) => f.bateu).map((f) => f.operador));
+  const eu = d.funcionarios.find((f) => f.eu);
+  if (eu && eu.bateu && !feitos.has(sessao.nome)) {
+    feitos.add(sessao.nome); guardar.por(chave, [...feitos]);
+    festa(eu, d);
+  } else if (jaBateram) {
+    for (const nome of agora) if (!jaBateram.has(nome) && nome !== sessao.nome) avisoMeta(`🏆 ${nome} bateu a meta! 👏`);
+  }
+  jaBateram = agora;
+}
+
+let fimFesta = 0;
+function festa(eu, d) {
+  const un = eu.unidade || d.por_etapa[d.setor].unidade;
+  $("festaTitulo").textContent = `PARABÉNS, ${eu.operador}!`;
+  $("festaTexto").textContent = `Você bateu a meta de hoje: ${eu.feito.toLocaleString("pt-BR")} ${un}! 🎉`;
+  $("festa").classList.remove("oculto");
+  fanfarra(); confete();
+  try { navigator.vibrate?.([100, 60, 100, 60, 300]); } catch {}
+  clearTimeout(fimFesta); fimFesta = setTimeout(fecharFesta, 9000);
+}
+function fecharFesta() { $("festa").classList.add("oculto"); if (sessao) focar(); }
+$("festa").addEventListener("click", fecharFesta);
+
+function avisoMeta(texto) {
+  const a = $("aviso-meta"); a.textContent = texto; a.classList.add("ver"); bip(true);
+  setTimeout(() => a.classList.remove("ver"), 5000);
+}
+
+function fanfarra() {
+  try {
+    audio ??= new (window.AudioContext || window.webkitAudioContext)();
+    [523, 659, 784, 1047].forEach((f, i) => {
+      const o = audio.createOscillator(), g = audio.createGain(), t0 = audio.currentTime + i * 0.16, dur = i === 3 ? .7 : .2;
+      o.type = "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(.18, t0); g.gain.exponentialRampToValueAtTime(.001, t0 + dur);
+      o.connect(g); g.connect(audio.destination); o.start(t0); o.stop(t0 + dur);
+    });
+  } catch {}
+}
+
+function confete() {
+  const c = $("confete"), ctx = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  const cores = ["#FACC15", "#9EF01A", "#38BDF8", "#F472B6", "#FB923C", "#FFFFFF"];
+  const pecas = Array.from({length: 160}, () => ({x: Math.random() * c.width, y: -20 - Math.random() * c.height,
+    v: 2 + Math.random() * 4, r: Math.random() * 6, g: Math.random() * 360, w: 6 + Math.random() * 8,
+    cor: cores[Math.random() * cores.length | 0]}));
+  const fim = Date.now() + 7000;
+  (function quadro() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    for (const p of pecas) {
+      p.y += p.v; p.x += Math.sin((p.y + p.g) / 40) * 1.5; p.g += p.r;
+      if (p.y > c.height && Date.now() < fim) { p.y = -10; p.x = Math.random() * c.width; }
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.g * Math.PI / 180);
+      ctx.fillStyle = p.cor; ctx.fillRect(-p.w / 2, -p.w / 4, p.w, p.w / 2); ctx.restore();
+    }
+    if (!$("festa").classList.contains("oculto") && (Date.now() < fim || pecas.some((p) => p.y < c.height))) requestAnimationFrame(quadro);
+  })();
 }
 
 // ── Início ────────────────────────────────────────────────────────────────
