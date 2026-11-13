@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0D0D0C">
+<title>DJON · Clube de clientes</title>
+<link rel="icon" href="logos/djon.png">
+<style>
+:root{
+  --cor:#BC1010; --cor-escura:#8F0B0B; --sobre-cor:#FFFFFF;
+  --fundo:#F4F4F5; --card:#FFFFFF; --borda:#E4E4E7; --texto:#111111; --sub:#5F5F66; --escuro:#0D0D0C;
+  --erro:#D92D20; --erro-bg:#FEE4E2; --ok:#12B76A;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fundo);color:var(--texto);font-family:"Segoe UI",Roboto,"Helvetica Neue",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased}
+img{display:block}
+.oculto{display:none!important}
+
+/* ── Topo com a marca ── */
+.topo{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,#2A1212 0%,var(--escuro) 72%);
+  color:#fff;padding:26px 20px 92px;text-align:center}
+.marca-dagua{position:absolute;inset:-60%;background:url("logos/djon_branco.png") 0 0/64px auto repeat;
+  transform:rotate(-14deg);opacity:.06;pointer-events:none;animation:desliza 40s linear infinite}
+@keyframes desliza{to{background-position:256px 0}}
+.faixa{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--cor)}
+.selo-marca{position:relative;width:86px;height:86px;margin:0 auto 12px;border-radius:24px;background:#fff;
+  display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.35),0 0 0 4px rgba(255,255,255,.08)}
+.selo-marca img{width:78px;height:78px;border-radius:18px}
+.selo-marca .iniciais{font-weight:900;font-size:30px;letter-spacing:-.02em;color:var(--sobre-cor);
+  background:var(--cor);width:72px;height:72px;border-radius:18px;display:grid;place-items:center}
+.nome-loja{position:relative;font-size:23px;font-weight:800;letter-spacing:.01em}
+.nome-loja img{height:30px;margin:0 auto}
+.desc-loja{position:relative;color:#B8C0CC;font-size:13.5px;margin-top:3px}
+.provas{position:relative;display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:14px}
+.prova{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);
+  border-radius:999px;padding:6px 11px;font-size:12px;color:#E4E7EC}
+.prova svg{width:14px;height:14px;flex:none}
+
+/* ── Vitrine de produtos (anda sozinha) ── */
+.vitrine{position:relative;margin:-70px 0 0;overflow:hidden;padding:4px 0 6px;
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.trilho{display:flex;gap:12px;width:max-content;animation:vitrine 38s linear infinite}
+.vitrine:hover .trilho{animation-play-state:paused}
+@keyframes vitrine{to{transform:translateX(-50%)}}
+.produto{width:118px;flex:none;background:#fff;border-radius:16px;padding:6px;box-shadow:0 6px 18px rgba(16,24,40,.12)}
+.produto img{width:106px;height:106px;object-fit:cover;border-radius:11px;background:#F2F4F7}
+.produto span{display:block;font-size:10.5px;line-height:1.25;color:var(--sub);margin:5px 2px 2px;height:26px;overflow:hidden}
+
+/* ── Conteúdo ── */
+main{max-width:460px;margin:10px auto 0;padding:0 14px}
+.card{background:var(--card);border:1px solid var(--borda);border-radius:22px;padding:22px 20px;
+  box-shadow:0 12px 32px rgba(16,24,40,.08)}
+.oferta{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#FFF5F5,#FFFBEB);
+  border:1px solid #FECACA;border-radius:16px;padding:14px;margin-bottom:6px}
+.oferta .presente{font-size:30px;line-height:1}
+.oferta b{display:block;font-size:17px}
+.oferta span{font-size:13px;color:var(--sub)}
+h2{font-size:19px;margin:16px 0 2px}
+.sub{color:var(--sub);font-size:13.5px;margin:0 0 4px}
+label{display:block;font-size:13px;font-weight:650;margin:13px 0 6px}
+label small{font-weight:400;color:var(--sub)}
+.campo{position:relative}
+.campo svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#98A2B3}
+input[type=text],input[type=tel],input[type=email]{width:100%;height:50px;border:1.5px solid var(--borda);border-radius:14px;
+  padding:0 14px 0 42px;font-size:16px;background:#FCFCFD;color:var(--texto);transition:border-color .15s,box-shadow .15s}
+input:focus{outline:none;border-color:var(--cor);box-shadow:0 0 0 4px rgba(188,16,16,.14);background:#fff}
+.aceite{display:flex;gap:11px;align-items:flex-start;margin:18px 0 2px;font-size:13px;color:var(--sub);line-height:1.5}
+.aceite input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--cor-escura)}
+.aceite label{margin:0;font-weight:400}
+.botao{width:100%;height:56px;margin-top:16px;border:0;border-radius:16px;background:var(--cor);color:var(--sobre-cor);
+  font-size:17.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 8px 20px rgba(188,16,16,.28);transition:transform .1s}
+.botao:active{transform:scale(.985)}
+.botao:disabled{opacity:.55}
+.seguro{display:flex;align-items:center;justify-content:center;gap:6px;color:var(--sub);font-size:12px;margin-top:10px}
+.seguro svg{width:14px;height:14px;color:var(--ok)}
+.erro{background:var(--erro-bg);color:var(--erro);border-radius:12px;padding:11px 13px;margin-top:12px;font-size:14px}
+.robo{position:absolute;left:-5000px}
+
+.garantias{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0 0}
+.garantia{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:11px 8px;text-align:center;font-size:11.5px;
+  color:var(--sub);line-height:1.3}
+.garantia svg{width:20px;height:20px;color:var(--cor-escura);margin:0 auto 5px;display:block}
+.garantia b{display:block;color:var(--texto);font-size:12px;margin-bottom:1px}
+
+/* ── Cupom ── */
+.pronto{text-align:center}
+.pronto h2{font-size:22px;margin:6px 0 4px}
+.ticket{position:relative;margin:18px auto 10px;background:var(--escuro);color:#fff;border-radius:18px;padding:18px 16px 16px;
+  overflow:hidden}
+.ticket:before,.ticket:after{content:"";position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:var(--card);
+  transform:translateY(-50%)}
+.ticket:before{left:-11px}.ticket:after{right:-11px}
+.ticket small{color:#B8C0CC;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.codigo{font-size:30px;font-weight:900;letter-spacing:.1em;color:#FFD129;margin:6px 0 2px;word-break:break-all}
+.ticket{border-top:5px solid var(--cor)}
+.ticket .bonus{font-size:14px;color:#E4E7EC}
+.copiar{background:#fff;color:var(--texto);border:1.5px solid var(--borda);box-shadow:none;height:50px;font-size:15.5px}
+.pronto p{color:var(--sub);font-size:14px;line-height:1.55}
+.confete{position:fixed;top:-12px;width:9px;height:14px;border-radius:2px;pointer-events:none;animation:cai linear forwards;z-index:9}
+@keyframes cai{to{transform:translateY(105vh) rotate(720deg)}}
+
+footer{max-width:460px;margin:18px auto 34px;padding:0 22px;color:var(--sub);font-size:12px;line-height:1.6;text-align:center}
+footer a{color:var(--sub)}
+dialog{border:0;border-radius:18px;max-width:420px;padding:22px;color:var(--texto);line-height:1.55;font-size:14px}
+dialog::backdrop{background:rgba(14,17,23,.55)}
+dialog h3{margin:0 0 8px}
+dialog button{margin-top:12px;height:44px;font-size:15px}
+</style>
+</head>
+<body>
+
+<section class="topo">
+  <div class="marca-dagua" id="marcaDagua" aria-hidden="true"></div>
+  <div class="selo-marca" id="selo"><img src="logos/djon.png" alt="DJON"></div>
+  <div class="nome-loja" id="nomeLoja"><img src="logos/djon_nome_branco.png" alt="DJON"></div>
+  <div class="desc-loja" id="descLoja">Camisetas, uniformes e bonés personalizados</div>
+  <div class="provas">
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z"/></svg>Loja oficial no Mercado Livre</span>
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>Fábrica própria</span>
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>+48 mil clientes</span>
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Envio para todo o Brasil</span>
+  </div>
+  <div class="faixa"></div>
+</section>
+
+<div class="vitrine" aria-label="Alguns dos nossos produtos"><div class="trilho" id="trilho"></div></div>
+
+<main>
+  <form class="card" id="form" novalidate>
+    <div class="oferta">
+      <div class="presente">🎁</div>
+      <div><b>Obrigado pela sua compra!</b><span>Ganhe <b style="display:inline;font-size:13px" id="bonus">um desconto na próxima compra</b> entrando para o nosso clube de clientes.</span></div>
+    </div>
+    <h2>Receba seu cupom agora</h2>
+    <p class="sub">Leva menos de 1 minuto.</p>
+
+    <label for="nome">Seu nome</label>
+    <div class="campo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <input type="text" id="nome" autocomplete="name" maxlength="80" placeholder="Como podemos te chamar?"></div>
+
+    <label for="telefone">WhatsApp <small>com DDD</small></label>
+    <div class="campo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+      <input type="tel" id="telefone" autocomplete="tel" inputmode="numeric" placeholder="(16) 99999-9999" maxlength="16"></div>
+
+    <label for="email">E-mail</label>
+    <div class="campo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+      <input type="email" id="email" autocomplete="email" inputmode="email" maxlength="120" placeholder="seuemail@exemplo.com"></div>
+
+    <label for="cidade">Cidade <small>opcional</small></label>
+    <div class="campo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <input type="text" id="cidade" autocomplete="address-level2" maxlength="60" placeholder="Onde você mora?"></div>
+
+    <input type="text" id="site" class="robo" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="aceite">
+      <input type="checkbox" id="aceite">
+      <label for="aceite">Quero receber o cupom e as promoções da <b class="nome-marca">loja</b> por WhatsApp e e-mail.
+        Posso sair da lista quando quiser.</label>
+    </div>
+    <div class="erro oculto" id="erro"></div>
+    <button class="botao" type="submit" id="enviar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      <span>Quero meu cupom</span></button>
+    <div class="seguro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Conexão segura · Não pedimos CPF, endereço nem cartão</div>
+  </form>
+
+  <div class="card pronto oculto" id="pronto">
+    <div style="font-size:42px">🎉</div>
+    <h2>Pronto, <span id="primeiro"></span>! Você está no clube.</h2>
+    <div class="ticket">
+      <small>Seu cupom</small>
+      <div class="codigo" id="cupom"></div>
+      <div class="bonus" id="bonus2"></div>
+    </div>
+    <button class="botao copiar" id="copiar" type="button">Copiar cupom</button>
+    <p id="onde"></p>
+    <p>Guarde este código. Também vamos te avisar das próximas promoções pelo WhatsApp.</p>
+  </div>
+
+  <div class="garantias">
+    <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><b>Dados protegidos</b>conforme a LGPD</div>
+    <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg><b>Sem spam</b>só ofertas de verdade</div>
+    <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><b>Saia quando quiser</b>é só pedir</div>
+  </div>
+</main>
+
+<footer>
+  Este cadastro é da <b class="nome-marca">loja</b>, a mesma loja em que você comprou.
+  Usamos seu nome e contato só para enviar o cupom e as nossas promoções. Nunca vendemos nem repassamos seus dados.
+  <br><a href="#" id="abrirPrivacidade">Como cuidamos dos seus dados</a> ·
+  <a href="https://www.djon.com.br/" target="_blank" rel="noopener">Conheça a loja: djon.com.br</a>
+</footer>
+
+<dialog id="privacidade">
+  <h3>Como cuidamos dos seus dados</h3>
+  <p><b>O que guardamos:</b> nome, WhatsApp, e-mail e cidade, se você informar.</p>
+  <p><b>Para quê:</b> enviar o seu cupom e avisar sobre promoções da <span class="nome-marca">loja</span>.</p>
+  <p><b>O que não pedimos:</b> CPF, endereço, senha ou dados de cartão. Desconfie de quem pedir.</p>
+  <p><b>Seus direitos (LGPD):</b> você pode pedir para ver, corrigir ou apagar seus dados a qualquer momento,
+    respondendo a qualquer mensagem nossa.</p>
+  <button class="botao" type="button" id="fecharPrivacidade">Entendi</button>
+</dialog>
+
+<script>
+const FUNCAO = "https://phfucnpoeaqreutbwsot.supabase.co/functions/v1/leads";
+const MARCA = "DJON";
+const DESCRICAO = "Camisetas, uniformes e bonés personalizados";
+const $ = (id) => document.getElementById(id);
+const busca = new URLSearchParams(location.search);
+const origem = (busca.get("o") || "").slice(0, 20);
+const chaveLoja = (busca.get("l") || "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12);
+const loja = {cor: "#BC1010"};
+document.querySelectorAll(".nome-marca").forEach(e => e.textContent = MARCA);
+$("descLoja").textContent = DESCRICAO;
+
+// Vitrine com os produtos mais vendidos da loja (ou de todas).
+fetch("img/produtos.json").then(r => r.json()).then(todos => {
+  // Todos os produtos são da fábrica DJON: mostra os mais vendidos de todas as lojas.
+  const lista = Object.values(todos).flat();
+  if (!lista.length) return;
+  const html = lista.map(p => `<div class="produto"><img src="${p.img}" alt="" loading="lazy"><span>${p.nome.replace(/</g, "")}</span></div>`).join("");
+  $("trilho").innerHTML = html + html;
+}).catch(() => {});
+
+async function chamar(corpo) {
+  const r = await fetch(FUNCAO, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(corpo)});
+  return r.json();
+}
+chamar({acao: "config"}).then(c => {
+  if (c.bonus) $("bonus").textContent = c.bonus;
+}).catch(() => {});
+
+$("telefone").addEventListener("input", (e) => {
+  const d = e.target.value.replace(/\D/g, "").slice(0, 11);
+  e.target.value = d.length > 6 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`
+                 : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
+});
+
+function confete() {
+  const cores = ["#BC1010", "#0D0D0C", "#FFD129", "#FFAA00", "#ffffff"];
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement("i");
+    c.className = "confete";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = cores[i % cores.length];
+    c.style.animationDuration = 2.2 + Math.random() * 2 + "s";
+    c.style.animationDelay = Math.random() * .6 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5200);
+  }
+}
+
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const erro = $("erro");
+  erro.classList.add("oculto");
+  const botao = $("enviar");
+  botao.disabled = true;
+  botao.querySelector("span").textContent = "Enviando...";
+  try {
+    const r = await chamar({acao: "cadastrar", nome: $("nome").value, telefone: $("telefone").value,
+                            email: $("email").value, cidade: $("cidade").value, site: $("site").value,
+                            aceite: $("aceite").checked, origem: [origem, chaveLoja].filter(Boolean).join("-")});
+    if (r.erro) throw new Error(r.erro);
+    $("primeiro").textContent = $("nome").value.trim().split(" ")[0];
+    $("cupom").textContent = r.cupom || "Enviaremos pelo WhatsApp";
+    $("bonus2").textContent = r.bonus || "";
+    $("onde").textContent = r.onde_usar ? `Use ${r.onde_usar}.` : "";
+    $("copiar").classList.toggle("oculto", !r.cupom);
+    $("form").classList.add("oculto");
+    $("pronto").classList.remove("oculto");
+    window.scrollTo({top: 0, behavior: "smooth"});
+    confete();
+  } catch (err) {
+    erro.textContent = err.message || "Não conseguimos registrar agora. Tente de novo.";
+    erro.classList.remove("oculto");
+  } finally {
+    botao.disabled = false;
+    botao.querySelector("span").textContent = "Quero meu cupom";
+  }
+});
+
+$("copiar").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("cupom").textContent); $("copiar").textContent = "Copiado!"; }
+  catch (_) { $("copiar").textContent = "Segure no código para copiar"; }
+});
+$("abrirPrivacidade").addEventListener("click", (e) => { e.preventDefault(); $("privacidade").showModal(); });
+$("fecharPrivacidade").addEventListener("click", () => $("privacidade").close());
+</script>
+</body>
+</html>
