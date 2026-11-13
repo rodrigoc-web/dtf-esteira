@@ -21,37 +21,29 @@ img{display:block}
 
 /* ── Topo com a marca ── */
 .topo{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,#2A1212 0%,var(--escuro) 72%);
-  color:#fff;padding:26px 20px 92px;text-align:center}
+  color:#fff;padding:22px 20px 78px;text-align:center}
 .marca-dagua{position:absolute;inset:-60%;background:url("logos/djon_branco.png") 0 0/64px auto repeat;
   transform:rotate(-14deg);opacity:.06;pointer-events:none;animation:desliza 40s linear infinite}
 @keyframes desliza{to{background-position:256px 0}}
 .faixa{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--cor)}
-.selo-marca{position:relative;width:86px;height:86px;margin:0 auto 12px;border-radius:24px;background:#fff;
+.selo-marca{position:relative;width:64px;height:64px;margin:0 auto 10px;border-radius:18px;background:#fff;
   display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.35),0 0 0 4px rgba(255,255,255,.08)}
-.selo-marca img{width:78px;height:78px;border-radius:18px}
+.selo-marca img{width:58px;height:58px;border-radius:14px}
+.chamada{position:relative;font-size:25px;line-height:1.2;font-weight:800;margin:4px 0 6px}
+.chamada em{font-style:normal;color:#FFD129}
+.chamada-sub{position:relative;color:#C9C9CF;font-size:14px}
 .selo-marca .iniciais{font-weight:900;font-size:30px;letter-spacing:-.02em;color:var(--sobre-cor);
   background:var(--cor);width:72px;height:72px;border-radius:18px;display:grid;place-items:center}
 .nome-loja{position:relative;font-size:23px;font-weight:800;letter-spacing:.01em}
-.nome-loja img{height:30px;margin:0 auto}
+.nome-loja img{height:22px;margin:0 auto 8px}
 .desc-loja{position:relative;color:#B8C0CC;font-size:13.5px;margin-top:3px}
-.provas{position:relative;display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:14px}
-.prova{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);
-  border-radius:999px;padding:6px 11px;font-size:12px;color:#E4E7EC}
+.provas{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 14px;margin:16px 0 0;color:var(--sub)}
+.prova{display:inline-flex;align-items:center;gap:5px;font-size:12px}
 .prova svg{width:14px;height:14px;flex:none}
 
-/* ── Vitrine de produtos (anda sozinha) ── */
-.vitrine{position:relative;margin:-70px 0 0;overflow:hidden;padding:4px 0 6px;
-  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-.trilho{display:flex;gap:12px;width:max-content;animation:vitrine 38s linear infinite}
-.vitrine:hover .trilho{animation-play-state:paused}
-@keyframes vitrine{to{transform:translateX(-50%)}}
-.produto{width:118px;flex:none;background:#fff;border-radius:16px;padding:6px;box-shadow:0 6px 18px rgba(16,24,40,.12)}
-.produto img{width:106px;height:106px;object-fit:cover;border-radius:11px;background:#F2F4F7}
-.produto span{display:block;font-size:10.5px;line-height:1.25;color:var(--sub);margin:5px 2px 2px;height:26px;overflow:hidden}
 
 /* ── Conteúdo ── */
-main{max-width:460px;margin:10px auto 0;padding:0 14px}
+main{max-width:460px;margin:-58px auto 0;padding:0 14px;position:relative}
 .card{background:var(--card);border:1px solid var(--borda);border-radius:22px;padding:22px 20px;
   box-shadow:0 12px 32px rgba(16,24,40,.08)}
 .oferta{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#FFF5F5,#FFFBEB);
@@ -117,26 +109,15 @@ dialog button{margin-top:12px;height:44px;font-size:15px}
 <section class="topo">
   <div class="marca-dagua" id="marcaDagua" aria-hidden="true"></div>
   <div class="selo-marca" id="selo"><img src="logos/djon.png" alt="DJON"></div>
-  <div class="nome-loja" id="nomeLoja"><img src="logos/djon_nome_branco.png" alt="DJON"></div>
-  <div class="desc-loja" id="descLoja">Camisetas, uniformes e bonés personalizados</div>
-  <div class="provas">
-    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z"/></svg>Loja oficial no Mercado Livre</span>
-    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>Fábrica própria</span>
-    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>+48 mil clientes</span>
-    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Envio para todo o Brasil</span>
-  </div>
+  <div class="chamada">Ganhe <em id="bonus">um desconto na próxima compra</em></div>
+  <div class="chamada-sub">Obrigado por comprar com a gente! Deixe seu contato e receba o cupom agora.</div>
   <div class="faixa"></div>
 </section>
 
-<div class="vitrine" aria-label="Alguns dos nossos produtos"><div class="trilho" id="trilho"></div></div>
 
 <main>
   <form class="card" id="form" novalidate>
-    <div class="oferta">
-      <div class="presente">🎁</div>
-      <div><b>Obrigado pela sua compra!</b><span>Ganhe <b style="display:inline;font-size:13px" id="bonus">um desconto na próxima compra</b> entrando para o nosso clube de clientes.</span></div>
-    </div>
-    <h2>Receba seu cupom agora</h2>
+    <h2 style="margin-top:0">Seus dados para receber o cupom</h2>
     <p class="sub">Leva menos de 1 minuto.</p>
 
     <label for="nome">Seu nome</label>
@@ -182,6 +163,12 @@ dialog button{margin-top:12px;height:44px;font-size:15px}
     <p>Guarde este código. Também vamos te avisar das próximas promoções pelo WhatsApp.</p>
   </div>
 
+  <div class="provas" aria-label="Sobre a DJON">
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z"/></svg>Loja oficial no Mercado Livre</span>
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>Fábrica própria</span>
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>+48 mil clientes</span>
+    <span class="prova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Envio para todo o Brasil</span>
+  </div>
   <div class="garantias">
     <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><b>Dados protegidos</b>conforme a LGPD</div>
     <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg><b>Sem spam</b>só ofertas de verdade</div>
@@ -216,16 +203,7 @@ const origem = (busca.get("o") || "").slice(0, 20);
 const chaveLoja = (busca.get("l") || "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12);
 const loja = {cor: "#BC1010"};
 document.querySelectorAll(".nome-marca").forEach(e => e.textContent = MARCA);
-$("descLoja").textContent = DESCRICAO;
 
-// Vitrine com os produtos mais vendidos da loja (ou de todas).
-fetch("img/produtos.json").then(r => r.json()).then(todos => {
-  // Todos os produtos são da fábrica DJON: mostra os mais vendidos de todas as lojas.
-  const lista = Object.values(todos).flat();
-  if (!lista.length) return;
-  const html = lista.map(p => `<div class="produto"><img src="${p.img}" alt="" loading="lazy"><span>${p.nome.replace(/</g, "")}</span></div>`).join("");
-  $("trilho").innerHTML = html + html;
-}).catch(() => {});
 
 async function chamar(corpo) {
   const r = await fetch(FUNCAO, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(corpo)});
@@ -234,6 +212,8 @@ async function chamar(corpo) {
 chamar({acao: "config"}).then(c => {
   if (c.bonus) $("bonus").textContent = c.bonus;
 }).catch(() => {});
+
+if (matchMedia("(pointer: fine)").matches) $("nome").focus();
 
 $("telefone").addEventListener("input", (e) => {
   const d = e.target.value.replace(/\D/g, "").slice(0, 11);
