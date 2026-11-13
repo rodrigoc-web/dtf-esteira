@@ -53,6 +53,8 @@ header .quem span{font-size:12px;color:#C7CCD6}
 .entrar:disabled{opacity:.45}
 .msg{border-radius:12px;padding:12px 14px;margin-top:12px;font-size:15px}
 .msg.erro{background:var(--erro-bg);color:var(--erro)} .msg.aviso{background:var(--aviso-bg);color:var(--aviso)}
+.bloqueio{background:var(--erro);color:#fff;border-radius:14px;padding:16px;margin-top:12px;text-align:center;font-size:17px;line-height:1.5}
+.bloqueio b{font-size:21px}
 
 /* Esteira */
 #esteira{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);gap:16px;padding:16px;
@@ -402,8 +404,13 @@ async function buscar() {
 
 function mostrarPedido(r) {
   const p = r.pedido, et = r.etapa, meu = sessao.setor;
+  // BIPOU, CONFIRMOU (Rodrigo, 12/11/2026): sem tocar em Confirmar. Etapa já
+  // feita: bloqueio vermelho (retrabalho só com o administrador).
+  const bloqueado = et.concluidas.includes(meu) && !r.pode_retrabalho;
   pedidoAtual = p;
-  const ordem = ETAPAS.map((e) => e[0]);
+  // Só as etapas por onde ESTE pedido passa (produto sem personalização
+  // começa na Separação).
+  const ordem = (et.fluxo && et.fluxo.length) ? et.fluxo : ETAPAS.map((e) => e[0]);
   const jaFez = et.concluidas.includes(meu);
   const antes = ordem.slice(0, ordem.indexOf(meu)).filter((e) => !et.concluidas.includes(e));
   const icone = MKT.includes(p.plataforma) ? `<img class="mkt" src="marketplaces/${p.plataforma}.png" alt="">`
@@ -413,26 +420,32 @@ function mostrarPedido(r) {
       <div><b>${esc(i.nome || "SKU " + i.sku)}</b>
       <span>SKU ${esc(i.sku)}${i.variacao ? " · " + esc(i.variacao) : ""} · qtd ${i.quantidade}</span></div></div>`).join("");
   let aviso = "";
-  if (jaFez) aviso = `<div class="msg aviso">A ${esc(sessao.rotulo_setor)} deste pedido já foi registrada. Confirmar de novo conta como <b>retrabalho</b>.</div>`;
+  const feito = (r.registros || []).find((x) => x.etapa === meu && !x.retrabalho);
+  const quando = feito ? ` em ${feito.registrado_em.slice(8, 10)}/${feito.registrado_em.slice(5, 7)} às ${feito.registrado_em.slice(11, 16)} por ${esc(feito.operador)}` : "";
+  if (bloqueado) aviso = `<div class="bloqueio"><b>✖ JÁ REGISTRADO NA ${esc(sessao.rotulo_setor.toUpperCase())}</b><br>Esta etiqueta já foi bipada${quando}.<br>Para fazer o retrabalho, fale com o administrador.</div>`;
+  else if (jaFez) aviso = `<div class="msg aviso">A ${esc(sessao.rotulo_setor)} deste pedido já foi registrada${quando}. Confirmar de novo conta como <b>retrabalho</b>.</div>`;
   else if (antes.length) aviso = `<div class="msg aviso">Ainda falta: ${antes.map((e) => ETAPAS.find((x) => x[0] === e)[1]).join(", ")}.</div>`;
   $("cartao").innerHTML = `
     <div class="ped-topo">${icone}<div><h2>${esc(p.pedido_up)}</h2>
       <div class="sub">${esc(NOME_MKT[p.plataforma] || p.plataforma || "")}${p.loja ? " · " + esc(p.loja) : ""}${p.venda ? " · venda " + esc(p.venda) : ""}</div></div></div>
-    <div class="etapas">${ETAPAS.map(([k, n]) => `<span class="etapa${et.concluidas.includes(k) ? " feita" : ""}${k === meu ? " minha" : ""}">${et.concluidas.includes(k) ? "✓ " : ""}${n}</span>`).join("")}</div>
+    <div class="etapas">${ETAPAS.filter(([k]) => ordem.includes(k) || et.concluidas.includes(k)).map(([k, n]) => `<span class="etapa${et.concluidas.includes(k) ? " feita" : ""}${k === meu ? " minha" : ""}">${et.concluidas.includes(k) ? "✓ " : ""}${n}</span>`).join("")}</div>
     <div style="font-weight:700;margin-top:6px">Itens (${p.itens.length})</div>
     <div class="itens">${itens}</div>
     <div class="total">Total de peças: ${p.pecas}</div>
     ${aviso}
-    <button class="confirmar" id="confirmar">Confirmar Conclusão — ${esc(sessao.rotulo_setor)}</button>
-    <button class="btn contorno" style="width:100%;margin-top:8px;height:48px" id="cancelar">Cancelar</button>`;
-  $("confirmar").onclick = () => confirmar(p);
+    ${jaFez && !bloqueado ? `<button class="confirmar" id="confirmar" style="background:#F59E0B">↻ Registrar RETRABALHO — ${esc(sessao.rotulo_setor)}</button>` : ""}
+    <button class="btn contorno" style="width:100%;margin-top:8px;height:48px" id="cancelar">${bloqueado ? "Nova leitura" : "Cancelar"}</button>`;
+  if ($("confirmar")) $("confirmar").onclick = () => confirmar(p);
   $("cancelar").onclick = () => { cartaoVazio(); focar(); };
-  bip(true);
+  if (bloqueado) { bip(false); return; }
+  if (!jaFez) confirmar(p);                 // bipou -> já registra
+  else bip(true);
 }
 
 async function confirmar(p) {
   if (ocupado) return;
-  ocupado = true; $("confirmar").disabled = true; $("confirmar").textContent = "Registrando…";
+  ocupado = true;
+  if ($("confirmar")) { $("confirmar").disabled = true; $("confirmar").textContent = "Registrando…"; }
   try {
     const reg = await chamar("registrar", {pedido_up: p.pedido_up});
     const [dia, hora] = reg.registrado_em.split(" "); const [a, m, d] = dia.split("-");
@@ -445,8 +458,7 @@ async function confirmar(p) {
     $("nova").onclick = () => { cartaoVazio(); focar(); };
     pedidoAtual = null; bip(true); atualizarPainel();
   } catch (e) {
-    $("confirmar").disabled = false; $("confirmar").textContent = `Confirmar Conclusão — ${sessao.rotulo_setor}`;
-    alert(e.message); bip(false);
+    cartaoMsg("erro", "NÃO foi registrado", e.message); bip(false);
   } finally { ocupado = false; focar(); }
 }
 
@@ -517,7 +529,10 @@ function desenharRanking(lista) {
 
 let jaBateram = null;           // quem já tinha batido a meta na leitura anterior
 function comemorar(d) {
-  const chave = "esteira_festa_" + d.dia;
+  // A trava "uma comemoração por dia" é por META: se o administrador trocar a
+  // meta no meio do dia (num teste, por exemplo), bater a meta nova comemora de
+  // novo (Rodrigo, 13/11/2026: meta trocada pra teste e a festa não apareceu).
+  const chave = `esteira_festa_${d.dia}_${d.meta_pessoa || 0}`;
   const feitos = new Set(guardar.ler(chave) || []);
   const agora = new Set(d.funcionarios.filter((f) => f.bateu).map((f) => f.operador));
   const eu = d.funcionarios.find((f) => f.eu);
@@ -530,8 +545,9 @@ function comemorar(d) {
   jaBateram = agora;
 }
 
-let fimFesta = 0;
+let fimFesta = 0, abriuFesta = 0;
 function festa(eu, d) {
+  abriuFesta = Date.now();
   const un = eu.unidade || d.por_etapa[d.setor].unidade;
   $("festaTitulo").textContent = `PARABÉNS, ${eu.operador}!`;
   $("festaTexto").textContent = `Você bateu a meta de hoje: ${eu.feito.toLocaleString("pt-BR")} ${un}! 🎉`;
@@ -541,7 +557,9 @@ function festa(eu, d) {
   clearTimeout(fimFesta); fimFesta = setTimeout(fecharFesta, 9000);
 }
 function fecharFesta() { $("festa").classList.add("oculto"); if (sessao) focar(); }
-$("festa").addEventListener("click", fecharFesta);
+// Toque só fecha depois de 3 s: antes disso é o operador tocando pra seguir o
+// trabalho, e a comemoração sumia sem ninguém ver.
+$("festa").addEventListener("click", () => { if (Date.now() - abriuFesta > 3000) fecharFesta(); });
 
 function avisoMeta(texto) {
   const a = $("aviso-meta"); a.textContent = texto; a.classList.add("ver"); bip(true);
@@ -588,6 +606,20 @@ if (API.startsWith("/")) {   // servidor de teste: deixa claro que não grava na
 }
 if (sessao?.ficha) telaEsteira(); else telaLogin();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+// ── Atualização sozinha (Rodrigo, 13/11/2026) ─────────────────────────────
+// O tablet fica com a Esteira aberta o dia inteiro: uma melhoria publicada
+// só chegava quando alguém recarregasse. A cada 5 min confere o versao.txt
+// do site e, se mudou, recarrega -- só com a tela parada (sem pedido aberto,
+// sem comemoração na tela), pra nunca atrapalhar um bip.
+const VERSAO_PAGINA = "2026-11-13a";
+setInterval(async () => {
+  try {
+    const v = (await (await fetch("versao.txt?t=" + Date.now(), {cache: "no-store"})).text()).trim();
+    const parado = !pedidoAtual && !ocupado && $("festa").classList.contains("oculto");
+    if (v && v !== VERSAO_PAGINA && parado) location.reload();
+  } catch {}
+}, 5 * 60 * 1000);
 </script>
 </body>
 </html>
