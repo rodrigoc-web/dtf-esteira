@@ -413,6 +413,10 @@ function mostrarPedido(r) {
   const ordem = (et.fluxo && et.fluxo.length) ? et.fluxo : ETAPAS.map((e) => e[0]);
   const jaFez = et.concluidas.includes(meu);
   const antes = ordem.slice(0, ordem.indexOf(meu)).filter((e) => !et.concluidas.includes(e));
+  // ORDEM (Rodrigo, 17/11/2026: "não pode registrar Prensa sem ter passado
+  // pela Separação"): falta etapa anterior -> bloqueia. O Design não trava
+  // (pedido feito à mão no computador não tem o registro dele).
+  const faltando = jaFezAntes(et, meu) ? [] : antes.filter((e) => e !== "DESIGNER");
   const icone = MKT.includes(p.plataforma) ? `<img class="mkt" src="marketplaces/${p.plataforma}.png" alt="">`
     : `<div class="mkt" style="display:flex;align-items:center;justify-content:center;font-size:22px">🛍</div>`;
   const itens = p.itens.map((i) => `<div class="item">
@@ -423,6 +427,7 @@ function mostrarPedido(r) {
   const feito = (r.registros || []).find((x) => x.etapa === meu && !x.retrabalho);
   const quando = feito ? ` em ${feito.registrado_em.slice(8, 10)}/${feito.registrado_em.slice(5, 7)} às ${feito.registrado_em.slice(11, 16)} por ${esc(feito.operador)}` : "";
   if (bloqueado) aviso = `<div class="bloqueio"><b>✖ JÁ REGISTRADO NA ${esc(sessao.rotulo_setor.toUpperCase())}</b><br>Esta etiqueta já foi bipada${quando}.<br>Para fazer o retrabalho, fale com o administrador.</div>`;
+  else if (faltando.length) aviso = `<div class="bloqueio"><b>✖ FALTA ${faltando.map((e) => ETAPAS.find((x) => x[0] === e)[1].toUpperCase()).join(" E ")}</b><br>Este pedido ainda não passou por ${faltando.map((e) => ETAPAS.find((x) => x[0] === e)[1]).join(" e ")}.<br>NÃO foi registrado. Bipe primeiro lá.</div>`;
   else if (jaFez) aviso = `<div class="msg aviso">A ${esc(sessao.rotulo_setor)} deste pedido já foi registrada${quando}. Confirmar de novo conta como <b>retrabalho</b>.</div>`;
   else if (antes.length) aviso = `<div class="msg aviso">Ainda falta: ${antes.map((e) => ETAPAS.find((x) => x[0] === e)[1]).join(", ")}.</div>`;
   $("cartao").innerHTML = `
@@ -434,11 +439,11 @@ function mostrarPedido(r) {
     <div class="total">Total de peças: ${p.pecas}</div>
     ${aviso}
     ${jaFez && !bloqueado ? `<button class="confirmar" id="confirmar" style="background:#F59E0B">↻ Registrar RETRABALHO — ${esc(sessao.rotulo_setor)}</button>` : ""}
-    ${!jaFez && !bloqueado ? `<button class="confirmar" id="confirmar">✓ Confirmar ${esc(sessao.rotulo_setor)}</button>` : ""}
+    ${!jaFez && !bloqueado && !faltando.length ? `<button class="confirmar" id="confirmar">✓ Confirmar ${esc(sessao.rotulo_setor)}</button>` : ""}
     <button class="btn contorno" style="width:100%;margin-top:8px;height:48px" id="cancelar">${bloqueado ? "Nova leitura" : "Cancelar"}</button>`;
   if ($("confirmar")) $("confirmar").onclick = () => confirmar(p);
   $("cancelar").onclick = () => { cartaoVazio(); focar(); };
-  if (bloqueado) { bip(false); return; }
+  if (bloqueado || faltando.length) { bip(false); return; }
   // Bipou -> já registra. DEPOIS da busca terminar (17/11/2026): chamado
   // aqui dentro, o "ocupado" da busca ainda estava ligado e o confirmar()
   // desistia calado -- buscava o pedido e não registrava nada. O botão
@@ -446,6 +451,8 @@ function mostrarPedido(r) {
   if (!jaFez) setTimeout(() => confirmar(p), 0);
   else bip(true);
 }
+
+function jaFezAntes(et, meu) { return et.concluidas.includes(meu); }
 
 async function confirmar(p) {
   if (ocupado) return;
@@ -617,7 +624,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 // só chegava quando alguém recarregasse. A cada 5 min confere o versao.txt
 // do site e, se mudou, recarrega -- só com a tela parada (sem pedido aberto,
 // sem comemoração na tela), pra nunca atrapalhar um bip.
-const VERSAO_PAGINA = "2026-11-17a";
+const VERSAO_PAGINA = "2026-11-17b";
 setInterval(async () => {
   try {
     const v = (await (await fetch("versao.txt?t=" + Date.now(), {cache: "no-store"})).text()).trim();
