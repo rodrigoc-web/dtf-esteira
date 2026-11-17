@@ -617,7 +617,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 // só chegava quando alguém recarregasse. A cada 5 min confere o versao.txt
 // do site e, se mudou, recarrega -- só com a tela parada (sem pedido aberto,
 // sem comemoração na tela), pra nunca atrapalhar um bip.
-const VERSAO_PAGINA = "2026-11-13a";
+const VERSAO_PAGINA = "2026-11-17a";
 setInterval(async () => {
   try {
     const v = (await (await fetch("versao.txt?t=" + Date.now(), {cache: "no-store"})).text()).trim();
