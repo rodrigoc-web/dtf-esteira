@@ -434,11 +434,16 @@ function mostrarPedido(r) {
     <div class="total">Total de peças: ${p.pecas}</div>
     ${aviso}
     ${jaFez && !bloqueado ? `<button class="confirmar" id="confirmar" style="background:#F59E0B">↻ Registrar RETRABALHO — ${esc(sessao.rotulo_setor)}</button>` : ""}
+    ${!jaFez && !bloqueado ? `<button class="confirmar" id="confirmar">✓ Confirmar ${esc(sessao.rotulo_setor)}</button>` : ""}
     <button class="btn contorno" style="width:100%;margin-top:8px;height:48px" id="cancelar">${bloqueado ? "Nova leitura" : "Cancelar"}</button>`;
   if ($("confirmar")) $("confirmar").onclick = () => confirmar(p);
   $("cancelar").onclick = () => { cartaoVazio(); focar(); };
   if (bloqueado) { bip(false); return; }
-  if (!jaFez) confirmar(p);                 // bipou -> já registra
+  // Bipou -> já registra. DEPOIS da busca terminar (17/11/2026): chamado
+  // aqui dentro, o "ocupado" da busca ainda estava ligado e o confirmar()
+  // desistia calado -- buscava o pedido e não registrava nada. O botão
+  // "Confirmar" fica de reserva se o automático falhar.
+  if (!jaFez) setTimeout(() => confirmar(p), 0);
   else bip(true);
 }
 
