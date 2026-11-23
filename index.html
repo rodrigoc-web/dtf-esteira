@@ -89,6 +89,14 @@ header .quem span{font-size:12px;color:#C7CCD6}
 .feito .ok{font-size:64px;color:var(--ok);line-height:1}
 .faixa{border-radius:12px;padding:12px 18px;font-size:19px;font-weight:700;background:var(--ok-bg)}
 .faixa.re{background:var(--aviso-bg)}
+/* Mockup da designer (23/11/2026) */
+.mockup{margin-top:14px;border:2px solid var(--verde-esc);border-radius:14px;padding:10px;background:#fff;width:100%}
+.mockup .tit{font-weight:800;font-size:15px;margin-bottom:8px;text-align:left}
+.mockup img{display:block;margin:0 auto;max-width:100%;max-height:55vh;border-radius:10px;cursor:zoom-in}
+.mockup .sub{color:var(--sub);font-size:13px}
+#zoom{position:fixed;inset:0;z-index:60;background:#000e;display:flex;align-items:center;justify-content:center}
+#zoom img{max-width:96vw;max-height:94vh;border-radius:8px}
+#zoom.oculto{display:none}
 
 /* Painel */
 .painel h3{margin:0 0 10px;font-size:16px}
@@ -213,6 +221,7 @@ header .quem span{font-size:12px;color:#C7CCD6}
   <div class="trofeu">🏆</div><h1 id="festaTitulo">PARABÉNS!</h1><p id="festaTexto"></p>
   <div class="palmas"><span>👏</span><span>👏</span><span>👏</span></div><small>toque para continuar</small></div></div>
 <div id="aviso-meta"></div>
+<div id="zoom" class="oculto" title="Toque para fechar"><img alt="Mockup"></div>
 
 <script>
 "use strict";
@@ -408,6 +417,7 @@ function mostrarPedido(r) {
   // feita: bloqueio vermelho (retrabalho só com o administrador).
   const bloqueado = et.concluidas.includes(meu) && !r.pode_retrabalho;
   pedidoAtual = p;
+  p.mockup = r.mockup || null;
   // Só as etapas por onde ESTE pedido passa (produto sem personalização
   // começa na Separação).
   const ordem = (et.fluxo && et.fluxo.length) ? et.fluxo : ETAPAS.map((e) => e[0]);
@@ -437,12 +447,14 @@ function mostrarPedido(r) {
     <div style="font-weight:700;margin-top:6px">Itens (${p.itens.length})</div>
     <div class="itens">${itens}</div>
     <div class="total">Total de peças: ${p.pecas}</div>
+    <div id="mockupBox" data-pedido="${esc(p.pedido_up)}"></div>
     ${aviso}
     ${jaFez && !bloqueado ? `<button class="confirmar" id="confirmar" style="background:#F59E0B">↻ Registrar RETRABALHO — ${esc(sessao.rotulo_setor)}</button>` : ""}
     ${!jaFez && !bloqueado && !faltando.length ? `<button class="confirmar" id="confirmar">✓ Confirmar ${esc(sessao.rotulo_setor)}</button>` : ""}
     <button class="btn contorno" style="width:100%;margin-top:8px;height:48px" id="cancelar">${bloqueado ? "Nova leitura" : "Cancelar"}</button>`;
   if ($("confirmar")) $("confirmar").onclick = () => confirmar(p);
   $("cancelar").onclick = () => { cartaoVazio(); focar(); };
+  carregarMockup(p);
   if (bloqueado || faltando.length) { bip(false); return; }
   // Bipou -> já registra. DEPOIS da busca terminar (17/11/2026): chamado
   // aqui dentro, o "ocupado" da busca ainda estava ligado e o confirmar()
@@ -453,6 +465,34 @@ function mostrarPedido(r) {
 }
 
 function jaFezAntes(et, meu) { return et.concluidas.includes(meu); }
+
+// MOCKUP DA DESIGNER (Rodrigo, 23/11/2026): "na prensa, ao bipar, aparece
+// também o mockup". A busca só diz se tem; a imagem vem à parte e entra no
+// quadro #mockupBox do pedido certo (se já bipou outro, não pinta).
+const mockupsGuardados = new Map();
+async function carregarMockup(p) {
+  if (!p || !p.mockup) return;
+  const pedido = p.pedido_up;
+  const caixa = () => { const b = $("mockupBox"); return b && b.dataset.pedido === pedido ? b : null; };
+  const pintar = (m) => {
+    const b = caixa(); if (!b) return;
+    b.innerHTML = `<div class="mockup"><div class="tit">🖼 MOCKUP${m.designer ? " — feito por " + esc(m.designer) : ""}</div>
+      <img src="${m.imagem}" alt="Mockup do pedido"><div class="sub" style="text-align:center;margin-top:6px">Toque na imagem para ampliar</div></div>`;
+    b.querySelector("img").onclick = () => { $("zoom").querySelector("img").src = m.imagem; $("zoom").classList.remove("oculto"); };
+  };
+  if (mockupsGuardados.has(pedido)) return pintar(mockupsGuardados.get(pedido));
+  const b = caixa();
+  if (b) b.innerHTML = `<div class="mockup"><div class="tit">🖼 MOCKUP</div><span class="sub">carregando…</span></div>`;
+  try {
+    const m = await chamar("mockup", {pedido_up: pedido});
+    mockupsGuardados.set(pedido, m);
+    if (mockupsGuardados.size > 20) mockupsGuardados.delete(mockupsGuardados.keys().next().value);
+    pintar(m);
+  } catch (e) {
+    const c = caixa(); if (c) c.innerHTML = `<div class="mockup"><div class="tit">🖼 MOCKUP</div><span class="sub">Não carregou: ${esc(e.message)}</span></div>`;
+  }
+}
+$("zoom").onclick = () => $("zoom").classList.add("oculto");
 
 async function confirmar(p) {
   if (ocupado) return;
@@ -466,9 +506,11 @@ async function confirmar(p) {
       <div class="faixa${reg.retrabalho ? " re" : ""}">${reg.pecas} ${VERBO[reg.etapa] || "peças"}${reg.retrabalho ? " (retrabalho)" : ""}</div>
       <span style="color:var(--sub);font-size:13px">Registrado em ${d}/${m}/${a} às ${hora.slice(0, 5)}</span>
       <button class="btn verde" style="margin-top:10px;width:260px" id="nova">Nova leitura</button>
-      <span style="color:var(--sub);font-size:13px">ou bipe a próxima etiqueta</span></div>`;
+      <span style="color:var(--sub);font-size:13px">ou bipe a próxima etiqueta</span>
+      <div id="mockupBox" data-pedido="${esc(p.pedido_up)}" style="width:100%"></div></div>`;
     $("nova").onclick = () => { cartaoVazio(); focar(); };
     pedidoAtual = null; bip(true); atualizarPainel();
+    carregarMockup(p);
   } catch (e) {
     cartaoMsg("erro", "NÃO foi registrado", e.message); bip(false);
   } finally { ocupado = false; focar(); }
@@ -561,8 +603,15 @@ let fimFesta = 0, abriuFesta = 0;
 function festa(eu, d) {
   abriuFesta = Date.now();
   const un = eu.unidade || d.por_etapa[d.setor].unidade;
-  $("festaTitulo").textContent = `PARABÉNS, ${eu.operador}!`;
-  $("festaTexto").textContent = `Você bateu a meta de hoje: ${eu.feito.toLocaleString("pt-BR")} ${un}! 🎉`;
+  // Mensagem editável em Configurações do programa (23/11/2026): {nome},
+  // {feito}, {meta} e {unidade} -- a mesma troca de ui/components/festa_meta.py.
+  const msg = d.mensagem || {};
+  const unid = eu.feito === 1 ? ({"pedidos": "pedido", "peças": "peça"}[un] || un) : un;
+  const preencher = (modelo) => modelo.replaceAll("{nome}", eu.operador)
+    .replaceAll("{feito}", eu.feito.toLocaleString("pt-BR")).replaceAll("{meta}", (eu.meta || 0).toLocaleString("pt-BR"))
+    .replaceAll("{unidade}", unid).trim();
+  $("festaTitulo").textContent = preencher(msg.titulo || "PARABÉNS, {nome}!");
+  $("festaTexto").textContent = preencher(msg.texto || "Você bateu a meta de hoje: {feito} {unidade}!") + " 🎉";
   $("festa").classList.remove("oculto");
   fanfarra(); confete();
   try { navigator.vibrate?.([100, 60, 100, 60, 300]); } catch {}
@@ -624,7 +673,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 // só chegava quando alguém recarregasse. A cada 5 min confere o versao.txt
 // do site e, se mudou, recarrega -- só com a tela parada (sem pedido aberto,
 // sem comemoração na tela), pra nunca atrapalhar um bip.
-const VERSAO_PAGINA = "2026-11-17b";
+const VERSAO_PAGINA = "2026-11-23a";
 setInterval(async () => {
   try {
     const v = (await (await fetch("versao.txt?t=" + Date.now(), {cache: "no-store"})).text()).trim();
