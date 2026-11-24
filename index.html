@@ -92,7 +92,7 @@ header .quem span{font-size:12px;color:#C7CCD6}
 /* Mockup da designer (23/11/2026) */
 .mockup{margin-top:14px;border:2px solid var(--verde-esc);border-radius:14px;padding:10px;background:#fff;width:100%}
 .mockup .tit{font-weight:800;font-size:15px;margin-bottom:8px;text-align:left}
-.mockup img{display:block;margin:0 auto;max-width:100%;max-height:55vh;border-radius:10px;cursor:zoom-in}
+.mockup img{display:block;margin:0 auto;max-width:75%;max-height:32vh;border-radius:10px;cursor:zoom-in}
 .mockup .sub{color:var(--sub);font-size:13px}
 #zoom{position:fixed;inset:0;z-index:60;background:#000e;display:flex;align-items:center;justify-content:center}
 #zoom img{max-width:96vw;max-height:94vh;border-radius:8px}
@@ -466,6 +466,22 @@ function mostrarPedido(r) {
 
 function jaFezAntes(et, meu) { return et.concluidas.includes(meu); }
 
+// O PEDIDO COMO O DESIGNER VÊ (Rodrigo, 24/11/2026): marketplace, foto do
+// produto, nome do anúncio, SKU, variação, quantidade e total de peças --
+// também DEPOIS de registrar (antes, a tela verde só dizia o número).
+function blocoPedido(p) {
+  const icone = MKT.includes(p.plataforma) ? `<img class="mkt" src="marketplaces/${p.plataforma}.png" alt="">`
+    : `<div class="mkt" style="display:flex;align-items:center;justify-content:center;font-size:22px">🛍</div>`;
+  const itens = p.itens.map((i) => `<div class="item">
+      ${i.imagem && /^https?:\/\//.test(i.imagem) ? `<img class="foto" loading="lazy" src="${esc(i.imagem.replace(/^http:/, "https:"))}" alt="" onerror="this.style.visibility='hidden'">` : '<div class="foto"></div>'}
+      <div><b>${esc(i.nome || "SKU " + i.sku)}</b>
+      <span>SKU ${esc(i.sku)}${i.variacao ? " · " + esc(i.variacao) : ""} · qtd ${i.quantidade}</span></div></div>`).join("");
+  return `<div class="ped-topo" style="text-align:left">${icone}<div><h2>Pedido ${esc(p.pedido_up)}</h2>
+      <div class="sub">${esc(NOME_MKT[p.plataforma] || p.plataforma || "")}${p.loja ? " · " + esc(p.loja) : ""}</div></div></div>
+    <div class="itens" style="text-align:left">${itens}</div>
+    <div class="total">Total de peças: ${p.pecas}</div>`;
+}
+
 // MOCKUP DA DESIGNER (Rodrigo, 23/11/2026): "na prensa, ao bipar, aparece
 // também o mockup". A busca só diz se tem; a imagem vem à parte e entra no
 // quadro #mockupBox do pedido certo (se já bipou outro, não pinta).
@@ -502,9 +518,10 @@ async function confirmar(p) {
     const reg = await chamar("registrar", {pedido_up: p.pedido_up});
     const [dia, hora] = reg.registrado_em.split(" "); const [a, m, d] = dia.split("-");
     $("cartao").innerHTML = `<div class="feito"><div class="ok">✓</div>
-      <b style="font-size:24px">Produção registrada!</b><span style="color:var(--sub)">Pedido ${esc(p.pedido_up)}</span>
+      <b style="font-size:24px">Produção registrada!</b>
       <div class="faixa${reg.retrabalho ? " re" : ""}">${reg.pecas} ${VERBO[reg.etapa] || "peças"}${reg.retrabalho ? " (retrabalho)" : ""}</div>
       <span style="color:var(--sub);font-size:13px">Registrado em ${d}/${m}/${a} às ${hora.slice(0, 5)}</span>
+      <div style="width:100%;margin-top:6px">${blocoPedido(p)}</div>
       <button class="btn verde" style="margin-top:10px;width:260px" id="nova">Nova leitura</button>
       <span style="color:var(--sub);font-size:13px">ou bipe a próxima etiqueta</span>
       <div id="mockupBox" data-pedido="${esc(p.pedido_up)}" style="width:100%"></div></div>`;
@@ -673,7 +690,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 // só chegava quando alguém recarregasse. A cada 5 min confere o versao.txt
 // do site e, se mudou, recarrega -- só com a tela parada (sem pedido aberto,
 // sem comemoração na tela), pra nunca atrapalhar um bip.
-const VERSAO_PAGINA = "2026-11-23a";
+const VERSAO_PAGINA = "2026-11-24a";
 setInterval(async () => {
   try {
     const v = (await (await fetch("versao.txt?t=" + Date.now(), {cache: "no-store"})).text()).trim();
