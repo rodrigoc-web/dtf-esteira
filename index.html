@@ -426,7 +426,11 @@ function mostrarPedido(r) {
   // ORDEM (Rodrigo, 17/11/2026: "não pode registrar Prensa sem ter passado
   // pela Separação"): falta etapa anterior -> bloqueia. O Design não trava
   // (pedido feito à mão no computador não tem o registro dele).
-  const faltando = jaFezAntes(et, meu) ? [] : antes.filter((e) => e !== "DESIGNER");
+  // O que o sistema confirma sozinho ao registrar (pedido em folha montada)
+  // não bloqueia -- antes a tela travava "FALTA IMPRESSÃO" e o registrar,
+  // que confirmaria, nunca era chamado (27/11/2026).
+  const confirmaSozinho = r.confirma_sozinho || [];
+  const faltando = jaFezAntes(et, meu) ? [] : antes.filter((e) => e !== "DESIGNER" && !confirmaSozinho.includes(e));
   const icone = MKT.includes(p.plataforma) ? `<img class="mkt" src="marketplaces/${p.plataforma}.png" alt="">`
     : `<div class="mkt" style="display:flex;align-items:center;justify-content:center;font-size:22px">🛍</div>`;
   const itens = p.itens.map((i) => `<div class="item">
@@ -690,7 +694,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 // só chegava quando alguém recarregasse. A cada 5 min confere o versao.txt
 // do site e, se mudou, recarrega -- só com a tela parada (sem pedido aberto,
 // sem comemoração na tela), pra nunca atrapalhar um bip.
-const VERSAO_PAGINA = "2026-11-24a";
+const VERSAO_PAGINA = "2026-11-27a";
 setInterval(async () => {
   try {
     const v = (await (await fetch("versao.txt?t=" + Date.now(), {cache: "no-store"})).text()).trim();
